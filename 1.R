@@ -90,5 +90,85 @@ ggplot(berkeley, aes(Gender, Freq, fill = Admit)) +
   geom_col() + scale_fill_manual(values = c("Admitted" = 'darkgreen',
                                                              'Rejected' = 'darkred'))
 
+?iris
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_point() +
+  geom_smooth(method = 'lm')
+
+
+library(data.table)
+bookings <- fread('http://bit.ly/CEU-R-hotels-2018-prices')
+bookings[price < 100 & holiday == 1]
+
+bookings[price < 100][holiday == 1][1:5]
+
+bookings[price < 100 & holiday == 1, .N]
+bookings[price < 100 & holiday == 1, mean(price)]
+bookings[price < 100 & holiday == 1, summary(price)]
+bookings[price < 100 & holiday == 1, hist(price)]
+
+## TODO compute the avg price of bookings on weekends
+## TODO compute the avg price of bookings on weekdays
+
+bookings[weekend == 1, mean(price)]
+bookings[weekend == 0, mean(price)]
+
+bookings[, mean(price), by = weekend]
+
+bookings$price_per_night <- bookings$price / bookings$nnights
+bookings[, price_per_night := price / nnights]
+
+bookings[, .(price = mean(price), min = min(price), max = max(price)), 
+         by = .(weekend, nnights, holiday)]
+
+features <- fread('http://bit.ly/CEU-R-hotels-2018-features')
+merge(bookings, features, all.x = TRUE)
+?merge
+
+merge(bookings, features, all.x = TRUE)[is.na(city)]
+
+features
+
+## TODO country-level aggregated data on avg rating of hotels
+
+countries <- features[, .(rating = mean(rating, na.rm = TRUE)), by = country][!is.na(country)]
+setorder(countries, rating)
+countries
+
+
+countries[order(country)]
+countries[order(rating)]
+
+countries
+
+
+library(ggmap)
+?geocode
+library(tidygeocoder)
+?geocode
+
+countries <- data.table(tidygeocoder::geocode(countries, 'country'))
+
+library(maps)
+map('world', fill = TRUE, col = 1:10)
+
+world <- map_data('world')
+str(world)
+
+map <- ggplot() +
+  geom_map(data = world, map = world, aes(long, lat, map_id = region)) +
+  theme_void() +
+  coord_fixed(1.3)
+
+map + geom_point(data = countries, aes(long, lat, size = rating), color = 'orange')
+
+?get_stamenmap
+
+bbox <- c(left = min(countries$long), bottom = min(countries$lat),
+          right = max(countries$long), top = max(countries$lat))
+get_stamenmap(bbox = bbox, zoom = 4) %>% ggmap() +
+  geom_point(aes(x = long, y = lat, size = rating), data = countries, colour = "red") +
+  theme_void() +
+  coord_fixed(1.3)
 
 
