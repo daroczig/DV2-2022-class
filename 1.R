@@ -65,10 +65,30 @@ ggplot(mds, aes(X1, -X2, label = city)) + geom_text_repel()
 ## TODO same with mtcars
 ?mtcars
 
-mds <- cmdscale(dist(mtcars))
+library(ggplot2)
+library(ggrepel)
+mds <- cmdscale(dist(scale(mtcars)))
 mds <- data.frame(mds)
 mds$car <- rownames(mtcars)
 ggplot(mds, aes(X1, X2, label = car)) + geom_text_repel()
+
+scale(mtcars)
+
+
+UCBAdmissions
+
+berkeley <- as.data.frame(UCBAdmissions)
+ggplot(berkeley, aes(Gender, Freq, fill = Admit)) + 
+  geom_col(position = 'fill') + scale_fill_brewer(palette = 'Dark2')
+
+ggplot(berkeley, aes(Gender, Freq, fill = Admit)) + 
+  geom_col(position = 'fill') + scale_fill_manual(values = c("Admitted" = 'darkgreen',
+                                                             'Rejected' = 'darkred'))
+
+ggplot(berkeley, aes(Gender, Freq, fill = Admit)) + 
+  facet_wrap(~Dept) + 
+  geom_col() + scale_fill_manual(values = c("Admitted" = 'darkgreen',
+                                                             'Rejected' = 'darkred'))
 
 
 
