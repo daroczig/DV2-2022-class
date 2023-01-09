@@ -170,5 +170,41 @@ get_stamenmap(bbox = bbox, zoom = 4) %>% ggmap() +
   geom_point(aes(x = long, y = lat, size = rating), data = countries, colour = "red") +
   theme_void() +
   coord_fixed(1.3)
+str(features)
 
+anscombe
+plot(anscombe[, c(1, 5)])
+plot(anscombe[, c(2, 6)])
 
+cor(anscombe[, c(1, 5)])
+cor(anscombe[, c(2, 6)])
+
+mean(anscombe[, c(1)])
+mean(anscombe[, c(2)])
+mean(anscombe[, c(3)])
+
+lapply(1:4, function(i) mean(anscombe[, c(i)]))
+
+computemean <- function(i) {
+  mean(anscombe[, c(i)])
+}
+lapply(1:4, computemean)
+
+lapply(1:4, function(i) cor(anscombe[, c(i)], anscombe[, c(i+4)]))
+
+lapply(1:4, function(i) data.frame(x = anscombe[, c(i)], y = anscombe[, c(i+4)]))
+rbindlist(lapply(1:4, function(i) data.frame(x = anscombe[, c(i)], y = anscombe[, c(i+4)])))
+
+anscombe_df <- rbindlist(lapply(1:4, function(i) {
+  data.frame(
+    x = anscombe[, c(i)],
+    y = anscombe[, c(i+4)],
+    dataset = i)
+  }
+))
+
+## data.frame with 4x11 rows, 3 columns: x, y, dataset id
+ggplot(anscombe_df, aes(x, y)) + geom_point() + 
+  geom_smooth(method = 'lm', se = FALSE) + 
+  facet_wrap(~dataset) +
+  theme_bw()
